@@ -21,7 +21,7 @@ booktxt ='''|0|field|name|download|
 '''
 
 sub = '## {}  '
-book = '- {} | **{}**  '
+book = '- {} | {}  '
 
 
 d = 'book/'
@@ -40,53 +40,66 @@ for folderName in os.listdir(d):
     bookId = startBookId
     folder = os.path.join(d, folderName)
     if os.path.isdir(folder):
-        if  not folderName.startswith('.'):
-            print(folder)
+        # igonre .D file
+        if folderName.startswith('.'):
+            continue
+    
+        print(folder)
+        
+        thisSub = sub.format(folderName)
+        readme += thisSub+'\n'
+
+        targetFolder = os.path.join(t, folderName)
+        if not os.path.exists(targetFolder):
+            os.mkdir(targetFolder)
+        for file in  os.listdir(folder):
+            #only process pdf file
+            if not file.endswith('.pdf'):
+                continue
+
+            bookId += 1
+            sourceFileName = os.path.join(folder, file) 
             
-            thisSub = sub.format(folderName)
-            readme += thisSub+'\n'
+            
+            file = file.replace(' ','-')
+            targetFileName = os.path.join(folder, file) 
+            
+            if sourceFileName != targetFileName:
+                os.rename(sourceFileName,targetFileName)
+                    
+            fileDir = os.path.join(targetFolder, file) .replace('.pdf','')
+            if not os.path.exists(fileDir):
+                os.mkdir(fileDir)
+            print(file+' file')
+            txtName = os.path.join(targetFolder, file) .replace('.pdf','.txt')
+            #had write txt continue
+            if os.path.exists(txtName):
+                continue
 
-            targetFolder = os.path.join(t, folderName)
-            if not os.path.exists(targetFolder):
-                os.mkdir(targetFolder)
-            for file in  os.listdir(folder):
-                if file.endswith('.pdf'):
-                    bookId += 1
-                    sourceFileName = os.path.join(folder, file) 
+            pngName = os.path.join(fileDir, file).replace('.pdf','_%d.jpg')
+            shaderCommand = '''gs -dSAFER -dQUIET -dNOPLATFONTS -dNOPAUSE -dBATCH -sOutputFile=\"'''+pngName+'''\" -sDEVICE=jpeg -r144  -dUseTrimBox -dFirstPage=1 '''+targetFileName
+            # print(shaderCommand)
+            returnCode = subprocess.call(shaderCommand, shell=True)
+            if returnCode !=0 :
+                print(targetFileName+" result:"+str(returnCode) )
+            else:
+                print(pngName+' processed')
+                for jpgFileName in  os.listdir(fileDir):
+                    if not jpgFileName.endswith('.jpg'):
+                        continue
                     
+                    jgpFilePath = os.path.join(fileDir, jpgFileName)
+                    print(jgpFilePath+' processed')
+                    result = reader.readtext(jgpFilePath,detail = 0)
+                    info  = str(result)
+                    print(jgpFilePath+' result:'+info)
                     
-                    file = file.replace(' ','-')
-                    targetFileName = os.path.join(folder, file) 
-                    
-                    if sourceFileName != targetFileName:
-                        os.rename(sourceFileName,targetFileName)
-                    
-                    pngName = os.path.join(targetFolder, file) .replace('.pdf','%d.png')
-                    
+                    open(jgpFilePath.replace('.jpg','.txt'), "w").write(info)
 
-                    fileDir = os.path.join(targetFolder, file) .replace('.pdf','')
-                    if not os.path.exists(fileDir):
-                        os.mkdir(fileDir)
-                    print(file+' file')
-                    if not os.path.exists('fileDir'):
-                        pngName = os.path.join(fileDir, file).replace('.pdf','%d.jpg')
-                        txtName = os.path.join(targetFolder, file) .replace('.pdf','.txt')
-                        shaderCommand = '''gs -dSAFER -dQUIET -dNOPLATFONTS -dNOPAUSE -dBATCH -sOutputFile=\"'''+pngName+'''\" -sDEVICE=jpeg -r72 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -dUseCIEColor -dUseTrimBox -dFirstPage=1 '''+targetFileName
-                        # print(shaderCommand)
-                        returnCode = subprocess.call(shaderCommand, shell=True)
-                        if returnCode !=0 :
-                            print(targetFileName+" result:"+str(returnCode) )
-                        else:
-                            print(pngName+' processed')
-                            for jpgFileName in  os.listdir(fileDir):
-                                jgpFilePath = os.path.join(fileDir, jpgFileName)
-                                print(jgpFilePath+' processed')
-                                result = reader.readtext(jgpFilePath,detail = 0)
-                                print(jgpFilePath+' result:'+str(result))
-                                # open('text_ocr.txt',"w").write(str(result))
-                                thisBook = book.format(jpgFileName,str(result))
-                                readme += thisBook+'\n'
-                    open(txtName, "w").write(readme)
-                    readme=''
-                    # break
+                    # open('text_ocr.txt',"w").write(str(result))
+                    thisBook = book.format(jpgFileName,info)
+                    readme += thisBook+'\n'
+            open(txtName, "w").write(readme)
+            readme=''
+            # break
 

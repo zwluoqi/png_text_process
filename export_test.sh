@@ -1,5 +1,5 @@
-gs -dSAFER -dQUIET -dNOPLATFONTS -dNOPAUSE -dBATCH -sOutputFile="export/xxoo%d.jpg" -sDEVICE=jpeg -r72 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -dUseCIEColor -dUseTrimBox -dFirstPage=1 book/test/KXJJ-396.pdf
-  
+gs -dSAFER -dQUIET -dNOPLATFONTS -dNOPAUSE -dBATCH -sOutputFile="export/xxoo%d.jpg" -sDEVICE=jpeg -r144  -dUseTrimBox -dFirstPage=1 book/test/KXJJ-396.pdf
+#   -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -dUseCIEColor
 
 
 # gs -dSAFER -dQUIET -dNOPLATFONTS -dNOPAUSE -dBATCH \
