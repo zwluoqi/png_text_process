@@ -41,9 +41,22 @@ sudo pip3 install easyocr    # 运行安装脚本。
 因为使用pip安装需要本机编译，速度感人，所以这里选用已经编译好的包  
 下载地址：https://pypi.org/project/easyocr/#files  
 ## 5.运行Python代码提取图片和文字
-将pdf文件扔到book目录下的子目录中，然后运行Python脚本即可...   
+1.将pdf文件扔到book目录下的子目录中，然后运行Python脚本即可...   
 ```
 python3 get_png_text.py
+```
+2.运行app使用  
+```
+get_png_text.app {path} {language}
+```
+## 6.打包
+安装打包工具  
+```
+pip3 install pyinstaller
+```
+使用pyinstaller打包，可能出现easyocr没打到app中的情况，用--collect-all处理  
+```
+sudo pyinstaller -w --clean -p /Volumes/Samsung_T5/app  get_png_text.py --collect-all easyocr
 ```
 ## *问题归纳*
 easyocr最新版本1.5.0用的对应opencv-python-handness为4.5.4.60版本，需要做一些修改才能编译成功  
